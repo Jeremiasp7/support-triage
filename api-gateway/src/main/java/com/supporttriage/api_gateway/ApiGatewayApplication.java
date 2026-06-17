@@ -1,4 +1,4 @@
-package com.support_triage.api_gateway;
+package com.supporttriage.api_gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,43 +1,28 @@
 server:
   port: 8081
+
 spring:
   application:
     name: ticket-service
   config:
     import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketdb}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://localhost:5432/ticketdb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update
-resilience4j:
-  circuitbreaker:
-    instances:
-      ai-service:
-        register-health-indicator: true
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-  retry:
-    instances:
-      ai-service:
-        max-attempts: 3
-        wait-duration: 500ms
-        enable-exponential-backoff: true
-  timelimiter:
-    instances:
-      ai-service:
-        timeout-duration: 5s
-  bulkhead:
-    instances:
-      ai-service:
-        max-concurrent-calls: 10
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
 management:
   endpoints:
     web:
@@ -52,6 +37,7 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_URI:http://localhost:9411/api/v2/spans}
+
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

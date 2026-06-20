@@ -8,7 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.supporttriage.ticket_service.domain.Ticket;
+import com.supporttriage.ticket_service.domain.TicketCategory;
+import com.supporttriage.ticket_service.domain.TicketPriority;
 import com.supporttriage.ticket_service.domain.TicketStatus;
+import com.supporttriage.ticket_service.dto.AnalysisResultDto;
 import com.supporttriage.ticket_service.dto.TicketRequestDto;
 import com.supporttriage.ticket_service.dto.TicketResponseDto;
 import com.supporttriage.ticket_service.exceptions.TicketNotFoundException;
@@ -23,6 +26,7 @@ public class TicketService {
     private static final Logger log = LoggerFactory.getLogger(TicketService.class);
 
     private final TicketRepository ticketRepository;
+    private final AiGatewayService aiGatewayService;
 
     public TicketResponseDto create(TicketRequestDto request) {
         Ticket ticket = new Ticket();
@@ -33,9 +37,28 @@ public class TicketService {
         Ticket saved = ticketRepository.save(ticket);
         log.info("Ticket criado: {}", saved.getId());
         
-        // análise via ai-service quando o módulo for implementado
+        AnalysisResultDto analysis = aiGatewayService.analyzeTicket(ticket);
 
-        return toResponse(saved);
+        applyAnalysis(ticket, analysis);
+        Ticket updated = ticketRepository.save(saved);
+
+        return toResponse(updated);
+    }
+
+    private void applyAnalysis(Ticket ticket, AnalysisResultDto analysis) {
+        try {
+            ticket.setCategory(TicketCategory.valueOf(analysis.suggestedCategory()));
+        } catch (IllegalArgumentException ex) {
+            ticket.setCategory(TicketCategory.OTHER);
+        }
+
+        try {
+            ticket.setPriority(TicketPriority.valueOf(analysis.suggestedPriority()));
+        } catch (IllegalArgumentException ex) {
+            ticket.setPriority(TicketPriority.MEDIUM);
+        }
+
+        ticket.setStatus(analysis.requiresHuman() ? TicketStatus.ESCALATED : TicketStatus.AUTO_RESOLVED);
     }
 
     public TicketResponseDto findById(UUID id) {

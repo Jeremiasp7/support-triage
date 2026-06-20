@@ -24,6 +24,9 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
 
+ai-service:
+  graphql-url: ${AI_SERVICE_GRAPHQL_URL:http://localhost:8082/graphql}
+
 management:
   endpoints:
     web:

@@ -1,0 +1,13 @@
+mutation AnalyzeTicket($input: TicketInput!) {
+    analyzeTicket(input: $input) {
+        suggestedCategory
+        suggestedPriority
+        proposedSolution
+        confidence
+        requiresHuman
+        sources {
+            documentTitle
+            excerpt
+        }
+    }
+}

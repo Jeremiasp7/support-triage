@@ -1,0 +1,33 @@
+type Query {
+    chat(sessionId: String!, message: String!): ChatResponse!
+}
+
+type Mutation {
+    analyzeTicket(input: TicketInput!): AnalysisResult!
+}
+
+input TicketInput {
+    ticketId: String!
+    title: String!
+    description: String!
+}
+
+type AnalysisResult {
+    suggestedCategory: String!
+    suggestedPriority: String!
+    proposedSolution: String!
+    confidence: Float!
+    requiresHuman: Boolean!
+    sources: [Source!]!
+}
+
+type ChatResponse {
+    reply: String!
+    sessionId: String!
+    resolvedAutomatically: Boolean!
+}
+
+type Source {
+    documentTitle: String!
+    excerpt: String!
+}

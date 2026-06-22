@@ -35,7 +35,7 @@ public class AiGatewayService {
                     requiresHuman
                     sources {
                         documentTitle
-                        exerpt
+                        excerpt
                     }
                 }
             }

@@ -16,12 +16,11 @@ public class AiTicketController {
     
     private static final Logger log = LoggerFactory.getLogger(AiTicketController.class);
 
-    @SuppressWarnings("unused")
     @MutationMapping
     public AnalysisResultDto analyzeTicket(@Argument("input") TicketInputDto input) {
         log.info("Requisição recebida de análise mockada via GraphQL para o ticket: {}", input.ticketId());
 
-        if (true) throw new RuntimeException("Simulando falha do LLM para testar Circuit Breaker");
+        //if (true) throw new RuntimeException("Simulando falha do LLM para testar Circuit Breaker");
 
         return new AnalysisResultDto(
             "NETWORK",

@@ -7,7 +7,7 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}
   datasource:
-    url: jdbc:postgresql://localhost:5435/aidb
+    url: jdbc:postgresql://localhost:5436/aidb
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
   jpa:
@@ -18,9 +18,17 @@ spring:
       genai:
         api-key: ${OPENAI_API_KEY}
         chat:
-          options:
-            model: gemini-2.0-flash
-            temperature: 0.3
+          model: gemini-2.0-flash
+          temperature: 0.3
+        embedding:
+          text:
+            model: text-embedding-004
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 768
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
 
 eureka:
   client:

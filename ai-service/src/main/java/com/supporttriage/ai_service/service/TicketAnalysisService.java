@@ -42,9 +42,8 @@ public class TicketAnalysisService {
             - suggestedCategory deve ser exatamente um dos valores: NETWORK, SOFTWARE, HARDWARE, ACCESS, OTHER
             - suggestedPriority deve ser exatamente um dos valores: LOW, MEDIUM, HIGH, CRITICAL
             - confidence deve ser um número decimal entre 0.0 e 1.0
-            - requiresHuman deve ser true se a confiança for menor que 0.6 ou se o problema for crítico
+            - requiresHuman deve ser true se o problema for crítico
             - Use o contexto da base de conhecimento fornecido para embasar a solução
-            - Responda APENAS com o JSON, sem markdown, sem blocos de código, sem explicações
             """;
     
     public AnalysisResultDto analyze(TicketInputDto input) {
@@ -53,8 +52,8 @@ public class TicketAnalysisService {
         List<Document> relevantDocs = vectorStore.similaritySearch(
             SearchRequest.builder()
                 .query(input.title() +" " +input.description())
-                .topK(3)
-                .similarityThreshold(0.5)
+                .topK(1)
+                .similarityThreshold(0.4)
                 .build()   
         );
 

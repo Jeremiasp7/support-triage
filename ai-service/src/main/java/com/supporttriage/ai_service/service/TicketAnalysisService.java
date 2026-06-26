@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -77,6 +78,7 @@ public class TicketAnalysisService {
         String rawResponse = chatClient.prompt()
             .system(PROMPT)
             .user(userPrompt)
+            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, input.ticketId()))
             .call()
             .content();
 

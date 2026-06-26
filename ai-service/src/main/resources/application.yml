@@ -5,7 +5,7 @@ spring:
   application:
     name: ai-service
   config:
-    import: 
+    import:
       - optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}
       - optional:file:.env[.properties]
   datasource:
@@ -19,21 +19,17 @@ spring:
     graphiql:
       enabled: true
   ai:
-    google:
-      genai:
-        api-key: ${GEMINI_API_KEY}
-        chat:
-          model: gemini-2.0-flash
-          temperature: 0.3
-        embedding:
-          api-key: ${GEMINI_API_KEY}
-          text:
-            model: gemini-embedding-001
-            dimensions: 768
+    mistralai:
+      api-key: ${MISTRAL_API_KEY}
+      chat:
+        model: mistral-small-latest
+        temperature: 0.3
+      embedding:
+        model: mistral-embed
     vectorstore:
       pgvector:
         initialize-schema: true
-        dimensions: 768
+        dimensions: 1024
         distance-type: COSINE_DISTANCE
         index-type: HNSW
 

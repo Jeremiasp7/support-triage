@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -27,28 +28,37 @@ public class RagConfig {
 
     @PostConstruct
     public void loadKnowledgeBase() throws IOException {
-        log.info("Iniciando o carregamento da base de conhecimento. ");
 
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource[] resources = resolver.getResources("classpath:knowledge-base/*.md");
+        SearchRequest request = SearchRequest.builder()
+                .query("teste")
+                .topK(1)
+                .similarityThreshold(0.0)
+                .build();
 
-        if (resources.length == 0) {
-            log.warn("Nenhum documento encontrado");
+        if (!vectorStore.similaritySearch(request).isEmpty()) {
+            log.info("Base de conhecimento já indexada. Pulando indexação.");
             return;
         }
 
+        log.info("Indexando base de conhecimento...");
+
+        PathMatchingResourcePatternResolver resolver =
+                new PathMatchingResourcePatternResolver();
+
+        Resource[] resources =
+                resolver.getResources("classpath:knowledge-base/*.md");
+
         List<Document> allDocuments = new ArrayList<>();
+
         TokenTextSplitter splitter = TokenTextSplitter.builder().build();
 
         for (Resource resource : resources) {
-            log.info("Carregando documento: {}", resource.getFilename());
             TextReader reader = new TextReader(resource);
-            List<Document> docs = reader.get();
-            List<Document> chunks = splitter.apply(docs);
-            allDocuments.addAll(chunks);
+            allDocuments.addAll(splitter.apply(reader.get()));
         }
 
         vectorStore.add(allDocuments);
-        log.info("Base de conhecimento carregada: {} chunks indexados", allDocuments.size());
+
+        log.info("{} chunks indexados.", allDocuments.size());
     }
 }

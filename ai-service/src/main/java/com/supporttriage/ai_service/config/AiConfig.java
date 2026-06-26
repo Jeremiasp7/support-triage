@@ -8,6 +8,9 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.supporttriage.ai_service.mcp.EscalationTool;
+import com.supporttriage.ai_service.mcp.TicketHistoryTool;
+
 @Configuration
 public class AiConfig {
 
@@ -19,11 +22,17 @@ public class AiConfig {
     }
 
     @Bean
-    ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
+    ChatClient chatClient(
+        ChatClient.Builder builder, 
+        ChatMemory chatMemory,
+        TicketHistoryTool ticketHistoryTool,
+        EscalationTool escalationTool) {
+
         return builder
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(chatMemory).build()
                 )
+                .defaultTools(ticketHistoryTool, escalationTool)
                 .build();
     }
 }

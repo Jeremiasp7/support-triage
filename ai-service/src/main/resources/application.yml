@@ -26,6 +26,26 @@ spring:
         version: 1.0.0
         type: SYNC
         protocol: STREAMABLE
+      client:
+        enabled: true
+        name: support-triage-mcp-client
+        version: 1.0.0
+        type: SYNC
+        request-timeout: 30s
+        toolcallback:
+          enabled: true
+        stdio:
+          connections:
+            filesystem:
+              command: docker
+              args:
+                - run
+                - -i
+                - --rm
+                - --mount
+                - type=bind,src=C:\\support-triage-files,dst=/projects
+                - mcp/filesystem
+                - /projects
     mistralai:
       api-key: ${MISTRAL_API_KEY}
       chat:

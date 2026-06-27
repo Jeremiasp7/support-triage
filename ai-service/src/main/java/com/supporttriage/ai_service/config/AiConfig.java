@@ -7,6 +7,7 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,13 +39,15 @@ public class AiConfig {
             ChatClient.Builder builder,
             ChatMemory chatMemory,
             TicketHistoryTool ticketHistoryTool,
-            EscalationTool escalationTool) {
+            EscalationTool escalationTool,
+            @Qualifier("mcpToolCallbacks") ToolCallbackProvider mcpClienToolCallbackProvider) {
 
         return builder
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(chatMemory).build()
                 )
                 .defaultTools(ticketHistoryTool, escalationTool)
+                .defaultTools(mcpClienToolCallbackProvider)
                 .build();
     }
 }

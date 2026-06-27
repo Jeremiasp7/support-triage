@@ -19,6 +19,13 @@ spring:
     graphiql:
       enabled: true
   ai:
+    mcp:
+      server:
+        enabled: true
+        name: support-triage-mcp-server
+        version: 1.0.0
+        type: SYNC
+        protocol: STREAMABLE
     mistralai:
       api-key: ${MISTRAL_API_KEY}
       chat:

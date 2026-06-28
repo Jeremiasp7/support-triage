@@ -10,6 +10,8 @@ spring:
           uri: file:///C:/Users/jpinh/Documents/Disciplinas_UFRN/PD/Unidade_III/support-triage-config
           default-label: main
           clone-on-start: true
+          force-pull: true
+          refresh-rate: 30   
 
 eureka:
   client:
@@ -20,4 +22,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true

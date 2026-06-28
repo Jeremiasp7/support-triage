@@ -1,5 +1,6 @@
 server:
   port: 8083
+
 spring:
   application:
     name: notification-service
@@ -8,21 +9,24 @@ spring:
   cloud:
     function:
       definition: notifyUser;generateReport;validateTicket
+
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: "*"
   tracing:
     sampling:
       probability: 1.0
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_URI:http://localhost:9411/api/v2/spans}
+
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

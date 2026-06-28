@@ -24,6 +24,8 @@ spring:
               uri: lb://notification-service
               predicates:
                 - Path=/api/notifications/**
+              filters:
+                - StripPrefix=2
 
 eureka:
   client:

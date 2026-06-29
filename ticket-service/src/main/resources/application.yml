@@ -1,75 +1,7 @@
-server:
-  port: 8081
-
 spring:
-  http:
-    client:
-      connect-timeout: 3s
-      read-timeout: 5
   application:
     name: ticket-service
+
   config:
-    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}
-  datasource:
-    url: jdbc:postgresql://localhost:5433/ticketdb
-    username: postgres
-    password: postgres
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      ai-service:
-        register-health-indicator: true
-        sliding-window-size: 10
-        sliding-window-type: COUNT_BASED
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        permitted-number-of-calls-in-half-open-state: 3
-        automatic-transition-from-open-to-half-open-enabled: true
-  retry:
-    instances:
-      ai-service:
-        max-attempts: 3
-        wait-duration: 500ms
-        enable-exponential-backoff: true
-        exponential-backoff-multiplier: 2
-  bulkhead:
-    instances:
-      ai-service:
-        max-concurrent-calls: 10
-        max-wait-duration: 1s
-
-ai-service:
-  graphql-url: ${AI_SERVICE_GRAPHQL_URL:http://localhost:8082/graphql}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus,circuitbreakers
-  health:
-    circuitbreakers:
-      enabled: true
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_URI:http://localhost:9411/api/v2/spans}
-
-logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    import:
+      - optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}

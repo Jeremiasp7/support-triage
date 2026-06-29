@@ -4,9 +4,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.graphql.client.HttpSyncGraphQlClient;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.supporttriage.ticket_service.client.AiServiceClient;
 import com.supporttriage.ticket_service.domain.Ticket;
 import com.supporttriage.ticket_service.dto.AnalysisResultDto;
 import com.supporttriage.ticket_service.resilience.AiServiceFallback;
@@ -22,8 +23,9 @@ public class AiGatewayService {
     
     private static final Logger log = LoggerFactory.getLogger(AiGatewayService.class);
 
-    private final HttpSyncGraphQlClient aiServiceGraphQlClient;
+    private final AiServiceClient aiServiceClient;
     private final AiServiceFallback aiServiceFallback;
+    private final ObjectMapper objectMapper;
 
     private static final String ANALYZE_TICKET_MUTATION = """
             mutation AnalyzeTicket($input: TicketInput!) {
@@ -53,10 +55,19 @@ public class AiGatewayService {
             "description", ticket.getDescription()
         );
 
-        AnalysisResultDto result = aiServiceGraphQlClient.document(ANALYZE_TICKET_MUTATION)
-            .variable("input", input)
-            .retrieveSync("analyzeTicket")
-            .toEntity(AnalysisResultDto.class);
+        Map<String, Object> payload = Map.of(
+            "query", ANALYZE_TICKET_MUTATION,
+            "variables", Map.of("input", input)
+        );
+
+        Map<String, Object> response = aiServiceClient.analyzeTicket(payload);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> analyzeTicketData = (Map<String, Object>) data.get("analyzeTicket");
+
+        AnalysisResultDto result = objectMapper.convertValue(analyzeTicketData, AnalysisResultDto.class);
 
         log.info(
             "Análise recebida para o ticket {}: categoria = {}, prioridade = {}, requiresHuman = {}", 

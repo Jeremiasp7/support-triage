@@ -3,6 +3,8 @@ package com.supporttriage.ticket_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +25,19 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("api/tickets")
+@RefreshScope
 @RequiredArgsConstructor
 public class TicketController {
     
     private final TicketService ticketService;
+
+    @Value("${support.triage.welcome-message:Bem-vindo ao Suporte IA padrão!}")
+    private String welcomeMessage;
+
+    @GetMapping("/welcome")
+    public String getWelcomeMessage() {
+        return welcomeMessage;
+    }
 
     @PostMapping
     public ResponseEntity<TicketResponseDto> create(@Valid @RequestBody TicketRequestDto request) {

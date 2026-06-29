@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.supporttriage.ticket_service.client.NotificationServiceClient;
 import com.supporttriage.ticket_service.domain.Ticket;
 import com.supporttriage.ticket_service.domain.TicketCategory;
 import com.supporttriage.ticket_service.domain.TicketPriority;
 import com.supporttriage.ticket_service.domain.TicketStatus;
 import com.supporttriage.ticket_service.dto.AnalysisResultDto;
+import com.supporttriage.ticket_service.dto.TicketEventDto;
 import com.supporttriage.ticket_service.dto.TicketRequestDto;
 import com.supporttriage.ticket_service.dto.TicketResponseDto;
 import com.supporttriage.ticket_service.exceptions.TicketNotFoundException;
@@ -27,6 +29,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final AiGatewayService aiGatewayService;
+    private final NotificationServiceClient notificationServiceClient; // Cliente HTTP injetado
 
     public TicketResponseDto create(TicketRequestDto request) {
         Ticket ticket = new Ticket();
@@ -41,6 +44,8 @@ public class TicketService {
 
         applyAnalysis(ticket, analysis);
         Ticket updated = ticketRepository.save(saved);
+
+        notifyUser(updated, analysis.proposedSolution());
 
         return toResponse(updated);
     }
@@ -78,10 +83,32 @@ public class TicketService {
     public TicketResponseDto updateStatus(UUID id, TicketStatus status) {
         Ticket ticket = ticketRepository.findById(id)
             .orElseThrow(() -> new TicketNotFoundException(id));
+        
         ticket.setStatus(status);
         Ticket updated = ticketRepository.save(ticket);
         log.info("Ticket {} atualizado para status {}", id, status);
+        
+        notifyUser(updated, null);
+        
         return toResponse(updated);
+    }
+
+    private void notifyUser(Ticket ticket, String proposedSolution) {
+        try {
+            TicketEventDto event = new TicketEventDto(
+                ticket.getId().toString(),
+                ticket.getRequesterEmail(),
+                ticket.getStatus().name(),
+                ticket.getTitle(),
+                proposedSolution
+            );
+            
+            notificationServiceClient.sendNotification(event);
+            log.info("Notificação enviada com sucesso para o ticket {}", ticket.getId());
+            
+        } catch (Exception e) {
+            log.error("Falha ao tentar acionar o notification-service para o ticket {}: {}", ticket.getId(), e.getMessage());
+        }
     }
 
     private TicketResponseDto toResponse(Ticket ticket) {

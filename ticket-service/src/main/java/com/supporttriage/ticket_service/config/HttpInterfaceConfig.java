@@ -10,6 +10,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import com.supporttriage.ticket_service.client.AiServiceClient;
+import com.supporttriage.ticket_service.client.NotificationServiceClient;
 
 @Configuration
 public class HttpInterfaceConfig {
@@ -32,5 +33,14 @@ public class HttpInterfaceConfig {
         RestClientAdapter adapter = RestClientAdapter.create(restClient);
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
         return factory.createClient(AiServiceClient.class);
+    }
+
+    @Bean
+    public NotificationServiceClient notificationServiceClient(@Qualifier("loadBalancedBuilder") RestClient.Builder builder) {
+        // Aponta para o nome do serviço no Eureka!
+        RestClient restClient = builder.baseUrl("http://notification-service").build(); 
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(NotificationServiceClient.class);
     }
 }

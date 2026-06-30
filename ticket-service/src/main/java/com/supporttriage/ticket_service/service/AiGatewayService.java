@@ -70,8 +70,8 @@ public class AiGatewayService {
         AnalysisResultDto result = objectMapper.convertValue(analyzeTicketData, AnalysisResultDto.class);
 
         log.info(
-            "Análise recebida para o ticket {}: categoria = {}, prioridade = {}, requiresHuman = {}", 
-            ticket.getId(), result.suggestedCategory(), result.suggestedPriority(), result.requiresHuman()
+            "Análise recebida: categoria = {}, prioridade = {}, requer humano = {}", 
+            result.suggestedCategory(), result.suggestedPriority(), result.requiresHuman()
         );
 
         return result;
@@ -79,7 +79,7 @@ public class AiGatewayService {
 
     @SuppressWarnings("unused")
     private AnalysisResultDto analyzeFallback(Ticket ticket, Throwable cause) {
-        log.error("Falha ao comunicar com ai-service para o ticket {}: {}", ticket.getId(), cause.getMessage());
+        log.warn("Fallback acionado para o ticket {}. Motivo: {}", ticket.getId(), cause.getMessage());
         return aiServiceFallback.fallback(ticket.getId().toString(), cause);
     }
 }

@@ -22,7 +22,7 @@ public class AiTicketController {
 
     @MutationMapping
     public AnalysisResultDto analyzeTicket(@Argument("input") TicketInputDto input) {
-        log.info("Requisição recebida de análise mockada via GraphQL para o ticket: {}", input.ticketId());
+        log.info("Requisição recebida de análise via GraphQL para o ticket: {}", input.ticketId());
 
         return ticketAnalysisService.analyze(input);
     }

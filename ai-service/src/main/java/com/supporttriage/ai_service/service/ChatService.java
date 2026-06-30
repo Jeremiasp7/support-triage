@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,6 +36,16 @@ public class ChatService {
     
     public record ChatResponse(String reply, String sessionId, Boolean resolvedAutomatically) {}
 
+    private final List<ToolCallback> registeredTools;
+
+    @PostConstruct
+        public void listAllAvailableTools() {
+            log.info("--- Ferramentas MCP Registradas no Sistema ---");
+            for (ToolCallback tool : registeredTools) {
+                log.info("Ferramenta disponível: {}", tool.getClass());
+            }
+        }
+
     public ChatResponse chat(String sessionId, String message) {
         log.info("Chat recebido - sessao: {}, mensagem: {}", sessionId, message);
 
@@ -56,6 +68,7 @@ public class ChatService {
             .user(message)
             .advisors(advisor -> advisor.param(
                 ChatMemory.CONVERSATION_ID, sessionId))
+            .tools("getTicketHistory", "escalateTicket")
             .call()
             .content();
         

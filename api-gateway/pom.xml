@@ -56,6 +56,16 @@
 			<artifactId>zipkin-reporter-brave</artifactId>
 			<version>${zipkin-reporter.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+			<version>${spring-cloud-module.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+			<version>5.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

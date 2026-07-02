@@ -16,7 +16,7 @@ public class FallbackController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
         response.put("error", "Service Unavailable");
-        response.put("message", "O serviço solicitado está temporariamente indisponível devido a alta carga ou falha. Por favor, tente novamente em alguns instantes.");
+        response.put("message", "O serviço solicitado está temporariamente indisponível.");
         
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
